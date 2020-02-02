@@ -101,7 +101,6 @@ footer {
 А это бизнес, который им платит
 
 ---
-
 ## Что нужно бизнесу
 
 - Основной инструмент бизнеса — это эксель
@@ -111,7 +110,6 @@ footer {
 - etc…
 
 ---
-
 ## Но со временем
 
 - Количество данных растёт
@@ -134,7 +132,6 @@ _color: black
 # <!-- fit --> Что же делать? :scream:
 
 ---
-
 # Hadoop!
 
 - Бесплатно
@@ -143,7 +140,6 @@ _color: black
 - *Никто* не умеет готовить
 
 ---
-
 # Что значит «всё»?
 
 - SQL
@@ -158,7 +154,6 @@ _color: black
 ![bg fit](https://www.oreilly.com/library/view/apache-hive-essentials/9781788995092/assets/a64fec28-e2b2-42f0-96cf-098fe8385316.png)
 
 ---
-
 ## Шаг 1
 
 1. Без паники
@@ -166,7 +161,6 @@ _color: black
 3. Ищем волшебное слово **«Ambari»**
 
 ---
-
 ### Ambari
 
 Даёт нам простой (сравнительно) способ установки и настройки хадупа
@@ -181,7 +175,6 @@ ambari-agent start
 ```
 
 ---
-
 ## Шаг 2
 
 1. Ставим HDFS
@@ -212,7 +205,6 @@ p:nth-child(1) > img:nth-child(1) { transform: scaleX(-1) }
 ![bg](https://miro.medium.com/max/1416/1*WZks-LUukbigGIkcQL0h-g.jpeg)
 
 ---
-
 # И внезапно…
 
 Дата саентисты генерируют много кода.
@@ -222,27 +214,63 @@ p:nth-child(1) > img:nth-child(1) { transform: scaleX(-1) }
 **Время DevOps**
 
 ---
-
 <style scoped>
-ul {
-    font-size: 75%
+ul,p {
+    font-size: 85%
 }
 </style>
 
-![bg vertical right:25% drop-shadow](images/woman2.png)
+![bg right:25% drop-shadow](images/woman2.png)
 
 # Звуки паники
 
 Вопросы:
-
 - Continuous integration
 - Continuous delivery
-- Secured Process
 - Frequent releases
-- Automated testing
-- Monitoring
 - Automated rollback
+- Automated testing
+- Secured Process
+- Monitoring
 
 Courtesy of [@vvsevolovich](https://twitter.com/vvsevolodovich)
 
 ---
+# Continuous integration
+
+- Редко много народу работает над одним куском кода
+- Все задачи достаточно сильно изолированы
+- Нет больших причин усложнять ветвление
+
+*И найти ошибки всё равно сложно*
+
+---
+![bg right:30% drop-shadow](images/woman2.png)
+
+# План по DevOps
+
+- :ballot_box_with_check: Continuous integration
+- Continuous delivery
+- Frequent releases
+- Automated rollback
+- Automated testing
+- Secured Process
+- Monitoring
+
+---
+<!-- _class: lead -->
+# Continuous delivery
+
+### Как пространство для фантазии
+
+---
+
+# Что нужно для CD?
+
+- Миграция БД
+- Выкатывать обновления
+    *(без скандалов с заказчиков)*
+- Откатывать обновления
+- **Автоматизировать запуск**
+- Способ протестировать то что сделал *(автоматически?)*
+- Всё это должны делать люди, далёкие от администрирования
