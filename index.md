@@ -264,7 +264,6 @@ Courtesy of [@vvsevolovich](https://twitter.com/vvsevolodovich)
 ### Как пространство для фантазии
 
 ---
-
 # Что нужно для CD?
 
 - Миграция БД
@@ -274,3 +273,14 @@ Courtesy of [@vvsevolovich](https://twitter.com/vvsevolodovich)
 - **Автоматизировать запуск**
 - Способ протестировать то что сделал *(автоматически?)*
 - Всё это должны делать люди, далёкие от администрирования
+
+---
+# Миграция БД
+
+Production-ready решений нет!
+
+Есть вопрос на реддите, где нет ответа :smile:
+
+Поэтому пользуемся тем, что сделал я: [asm0dey/liquibase-hive](https://github.com/asm0dey/liquibase-hive)
+
+Надеюсь что всё станет лучше :pray:
