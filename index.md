@@ -317,7 +317,20 @@ ul,p {
 # Наша связка
 
 * Docker
+* GNU make
 * Airflow
 * Artifactory
-
+* Skein
 В докер мы уложили целый хадуп…
+
+---
+
+# Альтернативы Docker'у
+
+Для Spark существует несколько решений:
+
+1. Zeppelin
+2. spark-jobserver
+3. livy
+
+Теоретически Zeppelin — альтернатива JupyterHub. И с ним интегрируются Big Data Tools by JetBrains
