@@ -8,6 +8,10 @@ class: default
 paginate: true
 footer: @asm0di0 at Twitter&emsp13;&emsp13;@asm0dey at Telegram&emsp13;&emsp13;#DevOops2020
 ---
+<style>
+.hljs-variable { color: lightblue }
+.hljs-string { color: lightgreen }
+</style>
 <!--
 _backgroundImage: "linear-gradient(to bottom, #000 0%, #1a2028 50%, #293845 100%)"
 _class: lead
@@ -333,4 +337,141 @@ ul,p {
 2. spark-jobserver
 3. livy
 
-Теоретически Zeppelin — альтернатива JupyterHub. И с ним интегрируются Big Data Tools by JetBrains
+Теоретически Zeppelin — альтернатива JupyterHub. 
+И с ним интегрируются **Big Data Tools** by JetBrains
+
+---
+## Zeppelin
+
+![bg fit right:48%](https://zeppelin.apache.org/assets/themes/zeppelin/img/zeppelin_svg_logo.svg)
+
+Интерактивный блокнот, который может всё:
+
+- Scala
+- Java
+- Плагины
+- Внешний API
+
+**Но не смогли настроить так, чтобы работало для всех**
+
+
+---
+
+## spark-jobserver
+
+`is:issue is:open sort:updated-desc label:bug `
+
+На момент написания там 20 багов открытых багов, 3 из которых были для нас критичны.
+
+В том числе баг работы с HOCON конфигурацией
+
+---
+
+## Livy
+
+> *Livy enables programmatic, fault-tolerant, multi-tenant submission of Spark jobs from web/mobile apps (no Spark client needed). So, multiple users can interact with your Spark cluster concurrently and reliably.*
+
+Эту штуку неудобно использовать дата саентистам:
+
+- Нужна джава
+- Чтобы использовать сторонние библиотеки нужно укладывать их на HDFS
+
+---
+<!-- _class: lead -->
+
+![bg fit drop-shadow 95%](images/docker.svg)
+
+---
+
+# 12 Factor App
+
+```bash
+result=0
+for var in "V1" "V2" "V3"; do
+  if test -z "${!var}"; then
+    echo "Vatiable $var is not defined"
+    result=1
+  fi
+done
+test $result = 0 || exit 1
+
+spark-submit # args here
+```
+
+---
+## GNU Make
+
+```bash
+make myApp
+# sbt 'project myApp' assembly
+# docker build ...
+echo "To run your application run 'docker run --env-file …'"
+```
+```Makefile
+projects = someProject1 someProject2 
+
+define project_rule
+    build-$1:
+		sbt 'project $1' clean
+endef
+
+$(foreach f,$(projects),$(eval $(call project_rule,$f)))
+```
+
+---
+
+# Но зачем 12 факторов?
+
+![bg right:20% fit top drop-shadow 95%](https://api.iconify.design/logos-airflow.svg?download=true&box=true&inline=false&height=auto)
+
+Практически любые задачи (*ETL* и *DS*) надо запускать периодически
+
+Наш выбор — **Airflow**
+
+- Деление на среды
+- Программируем на Python
+- Есть глючный, но понятный UI (и становится лучше)
+- **Очень** много интеграций
+
+---
+
+## Программирование под Airflow
+
+Два базовых понятия:
+ - DAG
+ - Task
+
+```python
+dag = DAG(catchup=False, name="dag_name", 
+          start_date="20200202", schedule="0 3 * * *")
+task1 = SomeTask(dag=dag, name="somename1")
+task2 = SomeTask(dag=dag, name="somename2")
+task3 = SomeTask(dag=dag, name="")
+
+task1 > task2 > task3
+```
+
+---
+
+### Автоматизация рутины
+
+- Читаем все конфиги в формате HOCON из директории
+- Прогоняем их через DAG-генератор
+- регистрируем сгенерированные DAG'и в Airflow
+
+---
+
+# HOCON
+
+Ещё один конкурирующий формат
+YAML на стероидах
+
+```
+dag {
+  name = "somename"
+  image = "docker-image-base"${dag.name}
+  connections = [some, another]
+}
+```
+Его отлично умеет **Scala** и хорошо умеет **Python**. 
+И читать просто
