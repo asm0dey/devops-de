@@ -232,9 +232,9 @@ ul,p {
 - Continuous integration
 - Continuous delivery
 - Frequent releases
+- Secured Process
 - Automated rollback
 - Automated testing
-- Secured Process
 - Monitoring
 
 Courtesy of [@vvsevolovich](https://twitter.com/vvsevolodovich)
@@ -256,9 +256,9 @@ Courtesy of [@vvsevolovich](https://twitter.com/vvsevolodovich)
 - :ballot_box_with_check: Continuous integration
 - Continuous delivery
 - Frequent releases
+- Secured Process
 - Automated rollback
 - Automated testing
-- Secured Process
 - Monitoring
 
 ---
@@ -297,11 +297,7 @@ Production-ready решений нет!
 ## А ещё откатить
 
 ---
-<style scoped>
-ul,p {
-    font-size: 90%
-}
-</style>
+<style scoped> ul,p { font-size: 90% } </style>
 
 ## Есть много решений
 
@@ -320,12 +316,12 @@ ul,p {
 
 # Наша связка
 
-* Docker
+* Docker (С хадупом внутри…)
 * GNU make
 * Airflow
 * Artifactory
 * Skein
-В докер мы уложили целый хадуп…
+
 
 ---
 
@@ -461,9 +457,12 @@ task1 > task2 > task3
 
 ---
 
-# HOCON
 
-Ещё один конкурирующий формат
+![bg](https://imgs.xkcd.com/comics/standards.png)
+
+---
+# `HOCON`
+
 YAML на стероидах
 
 ```
@@ -473,5 +472,223 @@ dag {
   connections = [some, another]
 }
 ```
+
 Его отлично умеет **Scala** и хорошо умеет **Python**. 
 И читать просто
+
+---
+## Что мы храним в конфиге?
+
+1. Подключения
+   1. БД
+   2. GC/AWS/Azure etc
+   3. Ceph
+2. Переменные окружения
+3. Расписания
+
+`0 2 * * */13` → `0_2_A_A_AD13` (потому что новое расписание — новый DAG)
+
+---
+# DevSecOps
+
+В основном нас волнует внутренняя безопасность и надёжность
+
+1. Все пароли хранятся в Ansible Vault
+2. Для каждого человека создём пользователя с жёсткими квотами и ограничениями
+3. Все системы имеют своих собственных пользователей с правами пошире
+
+---
+<style scoped> ul,p { font-size: 90% } </style>
+# И всё хорошо пока всего хватает
+
+Однако со временем призодят *они*.
+
+> Мне надо запустить расчёт, на который на моём ноуте не хватает памяти
+
+Что делать?
+
+1. Запустить на кластере руками
+2. Запустить спарк, который в себе запустит приложение
+3. Написать драйвер для YARN
+4. или…
+
+---
+<style scoped> ul,p,a { font-size: 90% } </style>
+# Skein
+> A quantity of yarn, thread, or the like, put up together, after it is taken from the reel.
+
+https://jcrist.github.io/skein/
+
+Инструмент для запуска в кластере **чего угодно**
+
+Форматы описания:
+1. YAML
+2. Python
+
+---
+
+## YAML
+
+```yaml
+master:
+  resources:
+    memory: 2 GiB
+    vcores: 2
+  env:
+    FRIEND: Yarn
+  files: ["..."]
+  script: |
+    echo "Hello, $FRIEND!"
+    source .venv/bin/activate && python app.py
+```
+
+```bash
+skein application submit spec.yml
+```
+
+---
+# Python
+
+```py
+app=skein.ApplicationSpec(
+  master=skein.Master(
+    script="""
+    # script
+    """,
+    env={ FRIEND: "Yarn" },
+    files=[…],
+    resources=skein.Resources(
+      memory=2,
+      vcores=2 ) ) )
+
+with skein.Client() as client:
+  client.submit(app)
+```
+
+---
+<!-- _footer: "" -->
+### Распределённое исполнение
+
+*Key/Value store*
+
+```python
+client.kv.wait['mykey']
+client.kv['mykey'] = 'skein is a magic'
+```
+*Сервисы*
+Кроме основного узла можно запускать любое количество вспомогательных
+
+*Scale*
+```python
+client.scale(myservice, 15)
+```
+
+---
+
+## Упаковка
+
+https://jcrist.github.io/venv-pack/
+
+`venv-pack -o my_env.tar.gz`
+
+Skein из коробки поддерживает venv-pack
+
+---
+
+## Как тестироваться?
+
+https://jcrist.github.io/hadoop-test-cluster/
+
+* Hadoop 2 и 3
+* Kerberos
+* YARN
+
+Обёртка над `docker-compose`
+
+---
+![bg right:30% drop-shadow](images/woman2.png)
+
+# План по DevOps
+
+- :ballot_box_with_check: Continuous integration
+- :ballot_box_with_check: Continuous delivery
+- :ballot_box_with_check: Frequent releases
+- :ballot_box_with_check: Secured Process
+- Automated rollback
+- Automated testing
+- Monitoring
+
+---
+
+## Automated rollback
+
+Каждый джоб в докер
+Версионированный докер
+Версионированный набор DAG'ов в Airflow
+Всё в Artifactory™
+
+liquibase:
+1. Атомарные ченджи для каждой схемы
+2. Генерируем rollback-скрипт
+3. Выполняем rollback на одну версию назад
+
+---
+![bg right:30% drop-shadow](images/woman2.png)
+
+# План по DevOps
+
+- :ballot_box_with_check: Continuous integration
+- :ballot_box_with_check: Continuous delivery
+- :ballot_box_with_check: Frequent releases
+- :ballot_box_with_check: Secured Process
+- :ballot_box_with_check: Automated rollback
+- :question: Automated testing
+- Monitoring
+
+---
+
+# Monitoring
+
+1. Prometheus
+2. Graphana
+3. YARN UI
+4. Алерты в Slack
+5. Письма заинтересованным
+
+---
+<!-- _color: white -->
+![bg  brightness:30%](https://source.unsplash.com/Ptd-iTdrCJM)
+# Mission accomplished?
+
+**На самом деле нет!**
+
+Впереди ждут:
+* Аутентификация через Kerberos
+* Автоматизированное разворачивание поного кластера
+* Интеграция с большим количеством DS-инструментов
+
+---
+<!--
+_backgroundImage: "linear-gradient(to bottom, #000 0%, #1a2028 50%, #293845 100%)"
+_class: invert lead
+-->
+
+# Чему мы научились?
+
+1. Просто не будет!
+2. И скучно тоже
+3. Но задачи решаются (иногда велосипедами)
+4. Инструментов много, экомимтема богата, пространства для изучения бесконечно много
+5. Стройте стратегию развития вместе с заказчиком!
+
+---
+<!--
+_backgroundImage: "linear-gradient(to bottom, #000 0%, #1a2028 50%, #293845 100%)"
+_class: invert lead
+_footer: ""
+-->
+# Спасибо!
+
+Twitter: @asm0di0
+Telegram: @asm0dey
+Подкаст: it.asm0dey.ru + t.me/ps_podcast
