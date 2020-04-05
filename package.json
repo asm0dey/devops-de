@@ -11,8 +11,8 @@
     "serve": "marp server --watch index.md"
   },
   "devDependencies": {
-    "@marp-team/marp-cli": "^0.17.2",
-    "yaspeller": "^6.0.3"
+    "@marp-team/marp-cli": "^0.17.3",
+    "yaspeller": "^6.1.0"
   },
   "author": "asm0dey"
 }
