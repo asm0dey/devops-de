@@ -1,6 +1,6 @@
 ---
-marp: true
-title: "DevOps in DE: That's how we do it"
+marp: false
+title: "Data Engineering, который смог в DevOps"
 url: https://asm0dey.ru/p/devops-de
 theme: gaia
 size: 4K
@@ -20,8 +20,10 @@ _paginate: false
 _footer: ""
 -->
 
-# <!-- fit --> DevOps in DE:
-# <!-- fit --> That's how we do it
+# <!-- fit --> Data Engineering, который смог
+### (в DevOps)
+
+Паша Финкельштейн, JetBrains
 
 ---
 <!--
@@ -155,7 +157,55 @@ _color: black
 
 ---
 <!-- _footer: "" -->
-![bg fit](https://www.oreilly.com/library/view/apache-hive-essentials/9781788995092/assets/a64fec28-e2b2-42f0-96cf-098fe8385316.png)
+![bg fit](images/hadoop.png)
+
+---
+<!-- _footer: "" -->
+![bg fit](images/hdfs.png)
+
+---
+<!-- _footer: "" -->
+![bg fit](images/hdfs_arch.png)
+
+---
+<!-- _footer: "" -->
+![bg fit](images/alluxio.png)
+
+---
+<!-- _footer: "" -->
+![bg fit](images/yarn.png)
+
+---
+<!-- _footer: "" -->
+![bg fit](images/mesos.png)
+
+---
+<!-- _footer: "" -->
+![bg fit](images/processing.png)
+
+---
+<!-- _footer: "" -->
+![bg fit](images/sql.png)
+
+---
+<!-- _footer: "" -->
+![bg fit](images/hbase.png)
+
+---
+<!-- _footer: "" -->
+![bg fit](images/ambari.png)
+
+---
+<!-- _footer: "" -->
+![bg fit](images/security.png)
+
+---
+<!-- _footer: "" -->
+![bg fit](images/airflow.png)
+
+---
+<!-- _footer: "" -->
+![bg fit](images/atlas.png)
 
 ---
 ## Шаг 1
@@ -293,8 +343,7 @@ Production-ready решений нет!
 <!-- _class: lead -->
 # Протестировать то, что сделал
 
-## А также выкатить куда-то
-## А ещё откатить
+Собрать, задеплоить, запустить
 
 ---
 <style scoped> ul,p { font-size: 90% } </style>
@@ -316,83 +365,17 @@ Production-ready решений нет!
 
 # Наша связка
 
-* Docker (С хадупом внутри…)
 * GNU make
-* Airflow
 * Artifactory
+* Airflow
+* Docker (С хадупом внутри…)
 * Skein
 
-
 ---
+<!-- _color: white -->
+![bg](https://source.unsplash.com/dh3zAdGGOIY)
+# Собрать
 
-# Альтернативы Docker'у
-
-Для Spark существует несколько решений:
-
-1. Zeppelin
-2. spark-jobserver
-3. livy
-
-Теоретически Zeppelin — альтернатива JupyterHub. 
-И с ним интегрируются **Big Data Tools** by JetBrains
-
----
-## Zeppelin
-
-![bg fit right:48%](https://zeppelin.apache.org/assets/themes/zeppelin/img/zeppelin_svg_logo.svg)
-
-Интерактивный блокнот, который может всё:
-
-- Scala
-- Java
-- Плагины
-- Внешний API
-
-**Но не смогли настроить так, чтобы работало для всех**
-
-
----
-
-## spark-jobserver
-
-`is:issue is:open sort:updated-desc label:bug `
-
-На момент написания там 20 багов открытых багов, 3 из которых были для нас критичны.
-
-В том числе баг работы с HOCON конфигурацией
-
----
-
-## Livy
-
-> *Livy enables programmatic, fault-tolerant, multi-tenant submission of Spark jobs from web/mobile apps (no Spark client needed). So, multiple users can interact with your Spark cluster concurrently and reliably.*
-
-Эту штуку неудобно использовать дата саентистам:
-
-- Нужна джава
-- Чтобы использовать сторонние библиотеки нужно укладывать их на HDFS
-
----
-<!-- _class: lead -->
-
-![bg fit drop-shadow 95%](images/docker.svg)
-
----
-
-# 12 Factor App
-
-```bash
-result=0
-for var in "V1" "V2" "V3"; do
-  if test -z "${!var}"; then
-    echo "Vatiable $var is not defined"
-    result=1
-  fi
-done
-test $result = 0 || exit 1
-
-spark-submit # args here
-```
 
 ---
 ## GNU Make
@@ -416,13 +399,40 @@ $(foreach f,$(projects),$(eval $(call project_rule,$f)))
 
 ---
 
+# 12 Factor App
+
+```bash
+result=0
+for var in "V1" "V2" "V3"; do
+  if test -z "${!var}"; then
+    echo "Vatiable $var is not defined"
+    result=1
+  fi
+done
+test $result = 0 || exit 1
+
+spark-submit # args here
+```
+
+---
+
 # Но зачем 12 факторов?
 
-![bg right:20% fit top drop-shadow 95%](https://api.iconify.design/logos-airflow.svg?download=true&box=true&inline=false&height=auto)
 
 Практически любые задачи (*ETL* и *DS*) надо запускать периодически
 
-Наш выбор — **Airflow**
+- Конфигурация переменными окружения
+- Один билд — много деплоев
+
+---
+<!-- _color: white -->
+![bg brightness:80%](https://source.unsplash.com/ZZOCECWiwBI)
+# Задеплоить
+
+---
+![bg right:20% fit top drop-shadow 95%](https://api.iconify.design/logos-airflow.svg?download=true&box=true&inline=false&height=auto)
+
+# Airflow
 
 - Деление на среды
 - Программируем на Python
@@ -489,13 +499,64 @@ dag {
 `0 2 * * */13` → `0_2_A_A_AD13` (потому что новое расписание — новый DAG)
 
 ---
-# DevSecOps
 
-В основном нас волнует внутренняя безопасность и надёжность
+<!-- _color: white -->
+![bg](https://source.unsplash.com/pnPS3Ox_2vE)
+# Запустить
 
-1. Все пароли хранятся в Ansible Vault
-2. Для каждого человека создаём пользователя с жёсткими квотами и ограничениями
-3. Все системы имеют своих собственных пользователей с правами пошире
+---
+
+# Альтернативы Docker'у
+
+Для Spark существует несколько решений:
+
+1. Zeppelin
+2. spark-jobserver
+3. livy
+
+Теоретически Zeppelin — альтернатива JupyterHub. 
+И с ним интегрируются **Big Data Tools** by JetBrains
+
+---
+## Zeppelin
+
+![bg fit right:48%](https://zeppelin.apache.org/assets/themes/zeppelin/img/zeppelin_svg_logo.svg)
+
+Интерактивный блокнот, который может всё:
+
+- Scala
+- Java
+- Плагины
+- Внешний API
+
+**Но не смогли настроить так, чтобы работало для всех**
+
+
+---
+
+## spark-jobserver
+
+`is:issue is:open sort:updated-desc label:bug `
+
+На момент написания там 20 багов открытых багов, 3 из которых были для нас критичны.
+
+В том числе баг работы с HOCON конфигурацией
+
+---
+
+## Livy
+
+> *Livy enables programmatic, fault-tolerant, multi-tenant submission of Spark jobs from web/mobile apps (no Spark client needed). So, multiple users can interact with your Spark cluster concurrently and reliably.*
+
+Эту штуку неудобно использовать дата саентистам:
+
+- Нужна джава
+- Чтобы использовать сторонние библиотеки нужно укладывать их на HDFS
+
+---
+<!-- _class: lead -->
+
+![bg fit drop-shadow 95%](images/docker.svg)
 
 ---
 <style scoped> ul,p { font-size: 90% } </style>
@@ -613,6 +674,30 @@ https://jcrist.github.io/hadoop-test-cluster/
 - :ballot_box_with_check: Continuous integration
 - :ballot_box_with_check: Continuous delivery
 - :ballot_box_with_check: Frequent releases
+- Secured Process
+- Automated rollback
+- Automated testing
+- Monitoring
+
+---
+# DevSecOps
+
+В основном нас волнует внутренняя безопасность и надёжность
+
+1. Все пароли хранятся в Ansible Vault
+2. Для каждого человека создаём пользователя с жёсткими квотами и ограничениями
+3. Все системы имеют своих собственных пользователей с правами пошире
+
+---
+
+
+![bg right:30% drop-shadow](images/woman2.png)
+
+# План по DevOps
+
+- :ballot_box_with_check: Continuous integration
+- :ballot_box_with_check: Continuous delivery
+- :ballot_box_with_check: Frequent releases
 - :ballot_box_with_check: Secured Process
 - Automated rollback
 - Automated testing
@@ -656,6 +741,20 @@ liquibase:
 5. Письма заинтересованным
 
 ---
+![bg right:30% drop-shadow](images/woman2.png)
+
+# План по DevOps
+
+- :ballot_box_with_check: Continuous integration
+- :ballot_box_with_check: Continuous delivery
+- :ballot_box_with_check: Frequent releases
+- :ballot_box_with_check: Secured Process
+- :ballot_box_with_check: Automated rollback
+- :question: Automated testing
+- :ballot_box_with_check: Monitoring
+
+
+---
 <!-- _color: white -->
 ![bg  brightness:30%](https://source.unsplash.com/Ptd-iTdrCJM)
 # Mission accomplished?
@@ -675,6 +774,7 @@ _class: invert lead
 
 # Чему мы научились?
 
+1. DevOps реально сделать!
 1. Просто не будет!
 2. И скучно тоже
 3. Но задачи решаются (иногда велосипедами)
@@ -689,6 +789,6 @@ _footer: ""
 -->
 # Спасибо!
 
-Twitter: @asm0di0
-Telegram: @asm0dey
+@asm0di0 :bird:
+@asm0dey :earth_africa:
 Подкаст: it.asm0dey.ru + t.me/ps_podcast

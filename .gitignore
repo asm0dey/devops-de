@@ -234,3 +234,4 @@ tags
 
 index.*
 !index.md
+.vscode
