@@ -405,7 +405,7 @@ $(foreach f,$(projects),$(eval $(call project_rule,$f)))
 result=0
 for var in "V1" "V2" "V3"; do
   if test -z "${!var}"; then
-    echo "Vatiable $var is not defined"
+    echo "Variable $var is not defined"
     result=1
   fi
 done
@@ -735,7 +735,7 @@ liquibase:
 # Monitoring
 
 1. Prometheus
-2. Graphana
+2. Grafana
 3. YARN UI
 4. Алерты в Slack
 5. Письма заинтересованным
